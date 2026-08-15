@@ -1,0 +1,43 @@
+# --- Python (backend) ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+.pytest_cache/
+.coverage
+htmlcov/
+dist/
+build/
+
+# --- Secrets & environnement (jamais versionner) ---
+.env
+.env.*
+!.env.example
+
+# --- Frontend (Node) ---
+node_modules/
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+.next/
+out/
+dist/
+build/
+
+# --- Données locales / base vectorielle (Chroma) ---
+.chroma/
+chroma/
+*.sqlite3
+
+# --- IDE ---
+.vscode/
+.idea/
+*.suo
+*.user
+
+# --- OS ---
+.DS_Store
+Thumbs.db
+Desktop.ini
