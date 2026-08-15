@@ -158,5 +158,5 @@ class TestProductivityIndexRadialFlow:
                 oil_fvf_rb_stb=1.2,
                 drainage_radius_ft=1_000.0,
                 wellbore_radius_ft=0.33,
-                regime="transient",  # type: ignore[arg-type]
+                regime="transient",
             )

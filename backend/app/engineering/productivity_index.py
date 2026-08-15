@@ -88,7 +88,7 @@ def productivity_index_radial_flow(
     drainage_radius_ft: float,
     wellbore_radius_ft: float,
     skin_factor: float = 0.0,
-    regime: FlowRegime = FlowRegime.PSEUDO_STEADY_STATE,
+    regime: FlowRegime | str = FlowRegime.PSEUDO_STEADY_STATE,
 ) -> ProductivityIndexResult:
     """Estimate oil productivity index with the radial Darcy-flow equation.
 
@@ -113,13 +113,13 @@ def productivity_index_radial_flow(
     if drainage_radius_ft <= wellbore_radius_ft:
         raise ValueError("drainage_radius_ft must be greater than wellbore_radius_ft.")
 
-    if regime is FlowRegime.PSEUDO_STEADY_STATE:
-        correction = -0.75
-    elif regime is FlowRegime.STEADY_STATE:
-        correction = 0.0
-    else:
+    try:
+        flow_regime = FlowRegime(regime)
+    except ValueError as error:
         allowed_regimes = ", ".join(item.value for item in FlowRegime)
-        raise ValueError(f"regime must be one of: {allowed_regimes}.")
+        raise ValueError(f"regime must be one of: {allowed_regimes}.") from error
+
+    correction = -0.75 if flow_regime is FlowRegime.PSEUDO_STEADY_STATE else 0.0
     dimensionless_pressure_drop = (
         math.log(drainage_radius_ft / wellbore_radius_ft) + correction + skin_factor
     )
@@ -136,14 +136,14 @@ def productivity_index_radial_flow(
     )
     boundary_assumption = (
         "Constant-pressure outer boundary"
-        if regime is FlowRegime.STEADY_STATE
+        if flow_regime is FlowRegime.STEADY_STATE
         else "No-flow outer boundary after pressure stabilization"
     )
 
     return ProductivityIndexResult(
         value=value,
         unit=_PRODUCTIVITY_INDEX_UNIT,
-        method=f"radial_flow:{regime.value}",
+        method=f"radial_flow:{flow_regime.value}",
         assumptions=(
             "Homogeneous and isotropic reservoir",
             "Single-phase, stabilized radial oil flow",
