@@ -90,3 +90,29 @@ print('Collection prête :', collection.name, '| documents :', collection.count(
 
 > Premier appel : peut prendre quelques secondes le temps de télécharger le modèle
 > d'embedding. Les appels suivants sont instantanés (modèle mis en cache localement).
+
+## Ingestion du corpus (Jour 2)
+
+Le module `app.rag.ingest` découpe les documents de `docs/corpus/raw/` en chunks
+(sur limites de mots, avec chevauchement configurable) et les indexe dans Chroma.
+
+- `app.rag.chunking.chunk_text` — découpage pur, testé indépendamment (10 tests).
+- `app.rag.ingest.load_raw_documents` — lit les fichiers `.txt`, `.md` et `.pdf`
+  (extraction via `pypdf`) d'un dossier ; ignore les fichiers cachés et les
+  extensions non supportées (reportées dans `skipped_files`).
+- `app.rag.ingest.ingest_corpus` — orchestre chunking + indexation. Idempotent :
+  les IDs de chunk sont déterministes (`"{fichier}::chunk-{n}"`), donc relancer
+  l'ingestion sur le même corpus met à jour plutôt que dupliquer.
+
+### Lancer l'ingestion
+
+Une fois qu'Azra a déposé des documents dans `docs/corpus/raw/` (voir
+`docs/corpus/SOURCES.md`) :
+
+```bash
+cd backend
+python -m app.rag.ingest
+```
+
+Affiche le nombre de documents chargés, de chunks indexés, et les fichiers
+éventuellement ignorés (extension non supportée ou fichier vide).
