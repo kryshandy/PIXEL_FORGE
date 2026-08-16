@@ -1,6 +1,7 @@
-# Pixel Forge — Copilote IA pour la complétion & production de puits pétroliers conventionnels
+# PetroSage — Copilote IA pour la complétion & production de puits pétroliers conventionnels
 
 Projet soumis au **Pixel Forge AI Hackathon** (15 → 22 août 2026) · Catégorie **AI Agents** · Axe **Conception & Exploration — IA Oil & Gas**.
+Dépôt technique historique : `PIXEL_FORGE` (nom du hackathon) ; le projet lui-même s'appelle **PetroSage**.
 
 > Un copilote IA (RAG + LLM + calculs d'ingénierie) qui recommande une stratégie de complétion et de production adaptée à un puits pétrolier conventionnel, à partir des caractéristiques de son réservoir.
 
@@ -28,9 +29,13 @@ Projet soumis au **Pixel Forge AI Hackathon** (15 → 22 août 2026) · Catégor
 
 ```
 PIXEL_FORGE/
-├── backend/          # API FastAPI + module de calcul d'ingénierie (Krys)
+├── backend/
+│   └── app/
+│       ├── engineering/   # Calculs d'ingénierie (Krys)
+│       └── rag/           # Client Chroma, config, ingestion RAG (Flo)
 ├── frontend/         # Interface utilisateur React (Henri-Michel)
-├── docs/             # Documentation du projet
+├── docs/
+│   └── corpus/       # Corpus documentaire RAG (Azra) — voir docs/corpus/SOURCES.md
 ├── LICENSE           # MIT
 └── README.md
 ```
