@@ -56,3 +56,37 @@ et `rb/STB`. Les hypothèses et unités sont explicites dans le résultat retour
 
 > Ce module est un outil d'aide au calcul pour le prototype du hackathon. Toute décision
 > opérationnelle doit être vérifiée par un ingénieur qualifié avec des données de terrain validées.
+
+## Base vectorielle (Chroma)
+
+Le module `app.rag` gère la base vectorielle utilisée par le pipeline RAG.
+
+- `app.rag.config` : réglages via variables d'environnement (`CHROMA_PERSIST_DIR`,
+  `CHROMA_COLLECTION_NAME`, `EMBEDDING_MODEL`, `RAG_CHUNK_SIZE`, `RAG_CHUNK_OVERLAP`,
+  `RAG_TOP_K`), voir `.env.example` à la racine du dépôt.
+- `app.rag.chroma_client` : client Chroma persistant local (`get_chroma_client`)
+  et création/récupération de la collection du corpus (`get_or_create_corpus_collection`).
+- Embeddings : `all-MiniLM-L6-v2` exécuté localement en ONNX via
+  `chromadb.utils.embedding_functions.DefaultEmbeddingFunction` — gratuit, aucune
+  clé API requise. Au premier appel réel, chromadb télécharge le modèle (~90 Mo) ;
+  prévoir une connexion internet une seule fois.
+- La base est persistée sur disque dans `CHROMA_PERSIST_DIR` (`.chroma/` par défaut,
+  déjà ignoré par git). Elle survit aux redémarrages du backend.
+
+Le découpage du corpus en chunks et l'indexation effective (Jour 2) vivront dans
+`app.rag.ingest`, consommé par `docs/corpus/` (voir `docs/corpus/SOURCES.md` pour
+la collecte des sources par Azra).
+
+### Vérifier le setup localement
+
+```bash
+cd backend
+python -c "
+from app.rag.chroma_client import get_or_create_corpus_collection
+collection = get_or_create_corpus_collection()
+print('Collection prête :', collection.name, '| documents :', collection.count())
+"
+```
+
+> Premier appel : peut prendre quelques secondes le temps de télécharger le modèle
+> d'embedding. Les appels suivants sont instantanés (modèle mis en cache localement).
