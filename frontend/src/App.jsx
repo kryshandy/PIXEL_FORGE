@@ -12,6 +12,8 @@ function App() {
 
   return (
     <div className="page">
+      <HeroScene />
+
       <header className="site-header">
         <span className="site-header__logo">PetroSage</span>
         <nav className="site-header__nav">
@@ -23,16 +25,13 @@ function App() {
       </header>
 
       <section className="hero">
-        <div className="hero__scene">
-          <HeroScene />
-          <div className="hero__copy">
-            <span className="section-eyebrow">Copilote ingénierie réservoir</span>
-            <h1>Une recommandation d'ingénieur, sourcée et calculée.</h1>
-            <p>
-              PetroSage combine calculs pétrophysiques vérifiables et recherche
-              documentaire pour assister la complétion de puits pétroliers conventionnels.
-            </p>
-          </div>
+        <div className="hero__copy">
+          <span className="section-eyebrow">Copilote ingénierie réservoir</span>
+          <h1>Une recommandation d'ingénieur, sourcée et calculée.</h1>
+          <p>
+            PetroSage combine calculs pétrophysiques vérifiables et recherche
+            documentaire pour assister la complétion de puits pétroliers conventionnels.
+          </p>
         </div>
         <div className="hero__form">
           <ReservoirForm onSubmit={setResult} />
@@ -40,13 +39,15 @@ function App() {
         </div>
       </section>
 
-      <FeaturesSection />
-      <HowItWorksSection />
-      <TeamSection />
+      <div className="page__content">
+        <FeaturesSection />
+        <HowItWorksSection />
+        <TeamSection />
 
-      <footer className="site-footer">
-        <p>PetroSage — Copilote IA pour la complétion & production de puits pétroliers conventionnels.</p>
-      </footer>
+        <footer className="site-footer">
+          <p>PetroSage — Copilote IA pour la complétion & production de puits pétroliers conventionnels.</p>
+        </footer>
+      </div>
     </div>
   );
 }

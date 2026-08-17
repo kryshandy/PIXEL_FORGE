@@ -1,8 +1,8 @@
 const TEAM = [
-  { name: 'Florent « Flo »', github: '#' },
+  { name: 'Florent', github: 'https://github.com/floflowilwil-cpu' },
   { name: 'Krys', github: 'https://github.com/kryshandy' },
-  { name: 'Henri-Michel « n0X-00 »', github: '#' },
-  { name: 'Azra', github: '#' },
+  { name: 'Henri-Michel', github: 'https://github.com/Henri-Michel-Essomba-Djomeni' },
+  { name: 'Azra', github: 'https://github.com/Azra1808' },
 ];
 
 import { useReveal } from '../hooks/useReveal';
