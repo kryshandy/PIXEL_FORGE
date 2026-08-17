@@ -74,6 +74,14 @@ Le Jour 2 ajoute un module de calcul pur et testé pour l'indice de productivit�
 avec méthode par essai de puits et estimation radiale de Darcy. Les hypothèses et
 unités sont documentées dans [`backend/README.md`](backend/README.md).
 
+Les Jours 3–4 ajoutent des contrats API versionnés et testés pour :
+
+- l'indice de productivité et la pression de fracturation ;
+- une réponse de pré-analyse avec texte, sources et avertissement ;
+- l'intégration future du RAG/LLM sans modifier le contrat consommé par le frontend.
+
+Les routes sont documentées dans Swagger : `http://127.0.0.1:8000/docs`.
+
 ## Documentation complète
 
 La documentation métier et réglementaire du projet est maintenue dans [`docs/`](docs/).

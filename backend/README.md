@@ -116,3 +116,32 @@ python -m app.rag.ingest
 
 Affiche le nombre de documents chargés, de chunks indexés, et les fichiers
 éventuellement ignorés (extension non supportée ou fichier vide).
+
+## Contrats API — Jours 3 et 4
+
+Les routes suivantes sont disponibles sous le préfixe `/api/v1` et documentées dans Swagger.
+
+| Route | Usage |
+|---|---|
+| `POST /engineering-calculations/productivity-index` | Calcul par essai de puits ou écoulement radial |
+| `POST /engineering-calculations/fracture-pressure` | Estimation par gradient de fracturation × TVD |
+| `POST /recommendations` | Réponse de pré-analyse avec texte et sources |
+
+Exemple d'estimation de pression de fracturation :
+
+```json
+{
+  "trueVerticalDepthFt": 10000,
+  "fractureGradientPsiPerFt": 0.75,
+  "safetyMarginPsi": 500
+}
+```
+
+La réponse renvoie la pression estimée (`7500 psi`) et la pression maximale de
+traitement recommandée pour le screening (`7000 psi`). Cette estimation ne remplace
+pas une étude géomécanique ni la validation d'un programme de fracturation.
+
+La route `/recommendations` est volontairement prête pour le frontend : elle renvoie
+un contrat stable avec texte, citations et avertissement. Pour le moment, son moteur
+produit une pré-analyse déterministe ; Flo pourra remplacer ce moteur par l'adaptateur
+RAG/LLM sans changer l'API consommée par le frontend.
