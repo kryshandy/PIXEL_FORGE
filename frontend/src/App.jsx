@@ -8,7 +8,7 @@ import TeamSection from './components/TeamSection';
 import './App.css';
 
 function App() {
-  const [result, setResult] = useState(null);
+  const [result, setResult] = useState({ status: 'idle' });
 
   return (
     <div className="page">
@@ -35,7 +35,7 @@ function App() {
         </div>
         <div className="hero__form">
           <div className="hero__form-inner">
-            <ReservoirForm onSubmit={setResult} />
+            <ReservoirForm onResult={setResult} />
             <ResultPanel result={result} />
           </div>
         </div>
