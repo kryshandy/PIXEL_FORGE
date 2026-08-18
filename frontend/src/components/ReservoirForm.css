@@ -9,7 +9,7 @@
 
   position: relative;
   z-index: 1;
-  max-width: 480px;
+  width: 100%;
   margin: 0 auto;
   padding: 2rem;
   background: var(--panel);
@@ -59,6 +59,8 @@ label {
 }
 
 input, select {
+  width: 100%;
+  min-width: 0;
   background: var(--ink);
   border: 1px solid var(--border);
   border-radius: 3px;

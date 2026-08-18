@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
+import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 
 export default function HeroScene() {
   const mountRef = useRef(null);
@@ -9,93 +10,124 @@ export default function HeroScene() {
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     const scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2(0x0b1119, 0.05);
+    scene.fog = new THREE.FogExp2(0x0b1119, 0.045);
 
-    const camera = new THREE.PerspectiveCamera(45, mount.clientWidth / mount.clientHeight, 0.1, 100);
-    camera.position.set(0, 0.3, 6);
+    const camera = new THREE.PerspectiveCamera(42, window.innerWidth / window.innerHeight, 0.1, 100);
+    camera.position.set(0.2, 0.4, 6.2);
 
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setSize(mount.clientWidth, mount.clientHeight);
+    renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.1;
     mount.appendChild(renderer.domElement);
 
-    // Éclairage
-    scene.add(new THREE.AmbientLight(0x1a2530, 1.4));
-    const key = new THREE.PointLight(0xd99b3f, 8, 12);
-    key.position.set(3, 2, 3);
+    // Environnement pour de vrais reflets métalliques
+    const pmrem = new THREE.PMREMGenerator(renderer);
+    scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+
+    // Éclairage : key (haut-devant), rim (bas-arrière), top (au-dessus, pour les reflets/ombres du haut)
+    scene.add(new THREE.AmbientLight(0x1a2530, 0.5));
+
+    const key = new THREE.DirectionalLight(0xd99b3f, 3);
+    key.position.set(3, 4, 3);
+    key.castShadow = true;
+    key.shadow.mapSize.set(2048, 2048);
+    key.shadow.camera.left = -4;
+    key.shadow.camera.right = 4;
+    key.shadow.camera.top = 4;
+    key.shadow.camera.bottom = -4;
+    key.shadow.bias = -0.0015;
     scene.add(key);
-    const rim = new THREE.PointLight(0x4f9bd9, 4, 12);
-    rim.position.set(-3, -1, -2);
+
+    const top = new THREE.PointLight(0xffffff, 5, 9);
+    top.position.set(0, 4.5, 1.5);
+    scene.add(top);
+
+    const rim = new THREE.PointLight(0x4f9bd9, 5, 10);
+    rim.position.set(-3, -1.5, -2);
     scene.add(rim);
 
-    // Groupe principal : sphère de connaissances
+    // Groupe : sphère de connaissances facettée
     const knowledgeGroup = new THREE.Group();
 
-    // Coeur en wireframe (icosaèdre)
-    const icoGeo = new THREE.IcosahedronGeometry(1.6, 1);
-    const wireMat = new THREE.MeshBasicMaterial({
-      color: 0x2f4054,
-      wireframe: true,
-      transparent: true,
-      opacity: 0.5,
+    const icoGeo = new THREE.IcosahedronGeometry(1.85, 2);
+    const coreMat = new THREE.MeshPhysicalMaterial({
+      color: 0x2c3a48,
+      flatShading: true,
+      roughness: 0.22,
+      metalness: 1,
+      clearcoat: 0.5,
+      clearcoatRoughness: 0.2,
+      envMapIntensity: 2,
     });
-    const wireMesh = new THREE.Mesh(icoGeo, wireMat);
-    knowledgeGroup.add(wireMesh);
+    const coreMesh = new THREE.Mesh(icoGeo, coreMat);
+    coreMesh.castShadow = true;
+    coreMesh.receiveShadow = true;
+    knowledgeGroup.add(coreMesh);
 
-    // Coeur plein, léger, translucide
-    const coreGeo = new THREE.IcosahedronGeometry(1.58, 1);
-    const coreMat = new THREE.MeshStandardMaterial({
-      color: 0x17212b,
-      roughness: 0.4,
-      metalness: 0.3,
-      transparent: true,
-      opacity: 0.55,
-    });
-    knowledgeGroup.add(new THREE.Mesh(coreGeo, coreMat));
+    // Fines arêtes sombres entre facettes, pour le look "cage" de la référence
+    const edgesGeo = new THREE.EdgesGeometry(icoGeo);
+    const edgesMat = new THREE.LineBasicMaterial({ color: 0x0b1119, transparent: true, opacity: 0.5 });
+    knowledgeGroup.add(new THREE.LineSegments(edgesGeo, edgesMat));
 
-    // Noeuds lumineux aux sommets
-    const positionsAttr = icoGeo.attributes.position;
+    const vertGeo = new THREE.IcosahedronGeometry(1.5, 1);
+    const positionsAttr = vertGeo.attributes.position;
     const vertices = [];
     for (let i = 0; i < positionsAttr.count; i += 3) {
-      vertices.push(new THREE.Vector3(
-        positionsAttr.getX(i), positionsAttr.getY(i), positionsAttr.getZ(i)
-      ));
+      vertices.push(new THREE.Vector3(positionsAttr.getX(i), positionsAttr.getY(i), positionsAttr.getZ(i)));
     }
-    const nodeGeo = new THREE.SphereGeometry(0.045, 12, 12);
-    const nodeMat = new THREE.MeshStandardMaterial({
-      color: 0xd99b3f,
-      emissive: 0xd99b3f,
-      emissiveIntensity: 1.6,
-      roughness: 0.3,
-    });
+
+    const nodeGeo = new THREE.SphereGeometry(0.06, 32, 32);
     const nodes = [];
     vertices.forEach((v) => {
-      const node = new THREE.Mesh(nodeGeo, nodeMat.clone());
-      node.position.copy(v);
+      const nodeMat = new THREE.MeshPhysicalMaterial({
+        color: 0xd99b3f,
+        emissive: 0xd99b3f,
+        emissiveIntensity: 0.9,
+        roughness: 0.15,
+        metalness: 0.5,
+        clearcoat: 1,
+        clearcoatRoughness: 0.1,
+        envMapIntensity: 1.5,
+      });
+      const node = new THREE.Mesh(nodeGeo, nodeMat);
+      node.position.copy(v).multiplyScalar(1.02);
+      node.castShadow = true;
+      node.receiveShadow = true;
       knowledgeGroup.add(node);
       nodes.push(node);
     });
 
-    // Arcs "requête → source" reliant des sommets non adjacents (effet graphe RAG)
-    const linkMat = new THREE.LineBasicMaterial({ color: 0xd99b3f, transparent: true, opacity: 0.35 });
-    const linkCount = 10;
-    for (let i = 0; i < linkCount; i++) {
+    const linkMat = new THREE.MeshBasicMaterial({ color: 0xd99b3f, transparent: true, opacity: 0.3 });
+    for (let i = 0; i < 10; i++) {
       const a = vertices[Math.floor(Math.random() * vertices.length)];
       const b = vertices[Math.floor(Math.random() * vertices.length)];
       if (a === b) continue;
-      const mid = a.clone().add(b).multiplyScalar(0.5).multiplyScalar(1.35);
+      const mid = a.clone().add(b).multiplyScalar(0.5).multiplyScalar(1.4);
       const curve = new THREE.QuadraticBezierCurve3(a, mid, b);
-      const geo = new THREE.TubeGeometry(curve, 20, 0.004, 6, false);
-      knowledgeGroup.add(new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ color: 0xd99b3f, transparent: true, opacity: 0.4 })));
+      const geo = new THREE.TubeGeometry(curve, 24, 0.005, 6, false);
+      knowledgeGroup.add(new THREE.Mesh(geo, linkMat));
     }
 
+    knowledgeGroup.position.set(-1.6, 0.15, -1.8);
     scene.add(knowledgeGroup);
 
-    // Poussière de données en arrière-plan
+    const ground = new THREE.Mesh(
+      new THREE.PlaneGeometry(20, 20),
+      new THREE.ShadowMaterial({ opacity: 0.35 })
+    );
+    ground.rotation.x = -Math.PI / 2;
+    ground.position.y = -1.8;
+    ground.receiveShadow = true;
+    scene.add(ground);
+
     const particleCount = 90;
     const positions = new Float32Array(particleCount * 3);
     for (let i = 0; i < particleCount; i++) {
-      positions[i * 3] = (Math.random() - 0.5) * 10;
+      positions[i * 3] = (Math.random() - 0.5) * 12;
       positions[i * 3 + 1] = (Math.random() - 0.5) * 8;
       positions[i * 3 + 2] = (Math.random() - 0.5) * 6 - 2;
     }
@@ -107,13 +139,21 @@ export default function HeroScene() {
     );
     scene.add(particles);
 
+    const scrollState = { opacity: 1 };
+    function updateScrollFade() {
+      const heroHeight = window.innerHeight;
+      const fade = 1 - Math.min(window.scrollY / (heroHeight * 0.7), 1);
+      scrollState.opacity = fade;
+    }
+    window.addEventListener('scroll', updateScrollFade, { passive: true });
+    updateScrollFade();
+
     let frameId;
     const clock = new THREE.Clock();
     const mouse = { x: 0, y: 0 };
     const handleMouseMove = (e) => {
-      const rect = mount.getBoundingClientRect();
-      mouse.x = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
-      mouse.y = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
+      mouse.x = (e.clientX / window.innerWidth - 0.5) * 2;
+      mouse.y = (e.clientY / window.innerHeight - 0.5) * 2;
     };
     window.addEventListener('mousemove', handleMouseMove);
 
@@ -121,36 +161,40 @@ export default function HeroScene() {
       const t = clock.getElapsedTime();
       if (!prefersReducedMotion) {
         knowledgeGroup.rotation.y = t * 0.18;
-        knowledgeGroup.rotation.x = t * 0.12;
+        knowledgeGroup.rotation.x = t * 0.1;
         nodes.forEach((node, i) => {
           const pulse = 1 + Math.sin(t * 2 + i) * 0.25;
           node.scale.setScalar(pulse);
         });
         particles.rotation.y = t * 0.015;
-        camera.position.x = mouse.x * 0.5;
-        camera.position.y = 0.3 - mouse.y * 0.3;
-        camera.lookAt(0, 0, 0);
+        camera.position.x = -1.3 + mouse.x * 0.3;
+        camera.position.y = 0.4 - mouse.y * 0.2;
+        camera.lookAt(-1.6, 0.1, -1.8);
       }
+      knowledgeGroup.visible = scrollState.opacity > 0.02;
+      renderer.domElement.style.opacity = scrollState.opacity;
       renderer.render(scene, camera);
       frameId = requestAnimationFrame(animate);
     }
     animate();
 
-    const resizeObserver = new ResizeObserver(() => {
-      camera.aspect = mount.clientWidth / mount.clientHeight;
+    const handleResize = () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
-      renderer.setSize(mount.clientWidth, mount.clientHeight);
-    });
-    resizeObserver.observe(mount);
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    };
+    window.addEventListener('resize', handleResize);
 
     return () => {
       cancelAnimationFrame(frameId);
-      resizeObserver.disconnect();
+      window.removeEventListener('resize', handleResize);
       window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('scroll', updateScrollFade);
+      pmrem.dispose();
       renderer.dispose();
       mount.removeChild(renderer.domElement);
     };
   }, []);
 
-  return <div ref={mountRef} className="hero-scene" />;
+  return <div ref={mountRef} className="hero-scene-fixed" />;
 }

@@ -10,7 +10,7 @@ import { useReveal } from '../hooks/useReveal';
 export default function FeaturesSection() {
   const ref = useReveal();
   return (
-    <section className="how-section reveal" ref={ref} id="fonctionnalites">
+    <section className="how-section reveal" ref={ref} id="comment-ca-marche">
       <span className="section-eyebrow">Comment ça marche</span>
       <h2>Du réservoir à la recommandation</h2>
       <div className="how-steps">
