@@ -250,8 +250,24 @@ body { font-family: 'Inter', system-ui, sans-serif; }
 
 .hero__scene { display: flex; align-items: flex-end; }
 
+.hero__form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.hero__form-inner {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 420px;
+  gap: 1rem;
+}
+
 .hero__copy {
   max-width: 480px;
+  margin-top: 6rem;
 }
 
 .hero__copy h1 {
@@ -269,7 +285,6 @@ body { font-family: 'Inter', system-ui, sans-serif; }
 .result-panel {
   margin-top: 1rem;
   width: 100%;
-  max-width: 420px;
   padding: 1.25rem;
   border-radius: 8px;
   font-size: 0.85rem;
@@ -309,4 +324,8 @@ body { font-family: 'Inter', system-ui, sans-serif; }
   .site-header__nav { display: none; }
   .hero__scene { align-items: center; }
   .hero__copy { padding: 2rem 1.5rem; text-align: center; }
+}
+
+body {
+  overflow-x: hidden;
 }

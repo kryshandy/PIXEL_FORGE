@@ -34,8 +34,10 @@ function App() {
           </p>
         </div>
         <div className="hero__form">
-          <ReservoirForm onSubmit={setResult} />
-          <ResultPanel result={result} />
+          <div className="hero__form-inner">
+            <ReservoirForm onSubmit={setResult} />
+            <ResultPanel result={result} />
+          </div>
         </div>
       </section>
 

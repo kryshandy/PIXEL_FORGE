@@ -53,15 +53,15 @@ export default function HeroScene() {
     // Groupe : sphère de connaissances facettée
     const knowledgeGroup = new THREE.Group();
 
-    const icoGeo = new THREE.IcosahedronGeometry(1.5, 2);
+    const icoGeo = new THREE.IcosahedronGeometry(1.85, 2);
     const coreMat = new THREE.MeshPhysicalMaterial({
-      color: 0xb9c2cc,
+      color: 0x2c3a48,
       flatShading: true,
-      roughness: 0.18,
+      roughness: 0.22,
       metalness: 1,
-      clearcoat: 0.4,
-      clearcoatRoughness: 0.25,
-      envMapIntensity: 1.6,
+      clearcoat: 0.5,
+      clearcoatRoughness: 0.2,
+      envMapIntensity: 2,
     });
     const coreMesh = new THREE.Mesh(icoGeo, coreMat);
     coreMesh.castShadow = true;
@@ -80,20 +80,23 @@ export default function HeroScene() {
       vertices.push(new THREE.Vector3(positionsAttr.getX(i), positionsAttr.getY(i), positionsAttr.getZ(i)));
     }
 
-    const nodeGeo = new THREE.SphereGeometry(0.05, 16, 16);
+    const nodeGeo = new THREE.SphereGeometry(0.06, 32, 32);
     const nodes = [];
     vertices.forEach((v) => {
       const nodeMat = new THREE.MeshPhysicalMaterial({
         color: 0xd99b3f,
         emissive: 0xd99b3f,
-        emissiveIntensity: 1.4,
-        roughness: 0.2,
-        metalness: 0.3,
+        emissiveIntensity: 0.9,
+        roughness: 0.15,
+        metalness: 0.5,
         clearcoat: 1,
+        clearcoatRoughness: 0.1,
+        envMapIntensity: 1.5,
       });
       const node = new THREE.Mesh(nodeGeo, nodeMat);
       node.position.copy(v).multiplyScalar(1.02);
       node.castShadow = true;
+      node.receiveShadow = true;
       knowledgeGroup.add(node);
       nodes.push(node);
     });
@@ -109,7 +112,7 @@ export default function HeroScene() {
       knowledgeGroup.add(new THREE.Mesh(geo, linkMat));
     }
 
-    knowledgeGroup.position.set(0.6, 0.25, -1.3);
+    knowledgeGroup.position.set(-1.6, 0.15, -1.8);
     scene.add(knowledgeGroup);
 
     const ground = new THREE.Mesh(
@@ -164,9 +167,9 @@ export default function HeroScene() {
           node.scale.setScalar(pulse);
         });
         particles.rotation.y = t * 0.015;
-        camera.position.x = 0.2 + mouse.x * 0.3;
+        camera.position.x = -1.3 + mouse.x * 0.3;
         camera.position.y = 0.4 - mouse.y * 0.2;
-        camera.lookAt(0.6, 0.1, -1.3);
+        camera.lookAt(-1.6, 0.1, -1.8);
       }
       knowledgeGroup.visible = scrollState.opacity > 0.02;
       renderer.domElement.style.opacity = scrollState.opacity;
