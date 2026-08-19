@@ -16,6 +16,7 @@ dependencies = [
   "chromadb>=0.5,<1.0",
   "pypdf>=4.0,<6.0",
   "cryptography>=3.1,<47.0",
+  "anthropic>=0.40,<1.0",
   # Pinned: numpy>=2.2 ships .pyi stubs using PEP 695 `type` statements, which
   # break mypy when this project's `python_version` target is 3.10.
   "numpy<2.2",

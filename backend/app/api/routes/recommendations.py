@@ -3,7 +3,7 @@
 from fastapi import APIRouter
 
 from app.api.schemas import RecommendationRequest, RecommendationResponse
-from app.services.recommendations import build_preliminary_recommendation
+from app.services.recommendation_generator import generate_recommendation
 
 router = APIRouter(prefix="/recommendations", tags=["recommendations"])
 
@@ -11,8 +11,8 @@ router = APIRouter(prefix="/recommendations", tags=["recommendations"])
 @router.post(
     "",
     response_model=RecommendationResponse,
-    summary="Obtenir une réponse de recommandation avec sources",
+    summary="Obtenir une reponse de recommandation avec sources",
 )
 def create_recommendation(request: RecommendationRequest) -> RecommendationResponse:
-    """Expose a frontend-ready recommendation contract pending the RAG/LLM adapter."""
-    return build_preliminary_recommendation(request)
+    """Generate a RAG+LLM-backed recommendation for the given well parameters."""
+    return generate_recommendation(request)

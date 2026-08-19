@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 from fastapi.testclient import TestClient
 
 from app.main import app
@@ -103,47 +105,60 @@ def test_fracture_pressure_endpoint_returns_engineering_error_contract() -> None
 
 
 def test_recommendations_endpoint_exposes_text_and_sources() -> None:
-    response = client.post(
-        "/api/v1/recommendations",
-        json={
-            "wellName": "PF-01",
-            "rockType": "sandstone",
-            "porosityFraction": 0.18,
-            "permeabilityMd": 50.0,
-            "reservoirPressurePsi": 3_000.0,
-            "trueVerticalDepthFt": 10_000.0,
-            "productivityIndexStbDayPsi": 2.0,
-            "fracturePressurePsi": 7_500.0,
-        },
-    )
+    with (
+        patch("app.services.recommendation_generator.retrieve", return_value=[]),
+        patch(
+            "app.services.recommendation_generator.generate_text",
+            return_value="Recommandation pour le puits PF-01.",
+        ),
+    ):
+        response = client.post(
+            "/api/v1/recommendations",
+            json={
+                "wellName": "PF-01",
+                "rockType": "sandstone",
+                "porosityFraction": 0.18,
+                "permeabilityMd": 50.0,
+                "reservoirPressurePsi": 3_000.0,
+                "trueVerticalDepthFt": 10_000.0,
+                "productivityIndexStbDayPsi": 2.0,
+                "fracturePressurePsi": 7_500.0,
+            },
+        )
 
     assert response.status_code == 200
     payload = response.json()
     assert payload["status"] == "preliminary"
     assert "PF-01" in payload["recommendation"]
-    assert payload["sources"][0]["sourceType"] == "calculation"
 
 
 def test_recommendations_endpoint_preserves_rag_sources() -> None:
-    response = client.post(
-        "/api/v1/recommendations",
-        json={
-            "wellName": "PF-02",
-            "rockType": "limestone",
-            "porosityFraction": 0.12,
-            "permeabilityMd": 15.0,
-            "reservoirPressurePsi": 2_500.0,
-            "trueVerticalDepthFt": 8_000.0,
-            "sources": [
-                {
-                    "sourceType": "rag",
-                    "title": "SPE reference",
-                    "excerpt": "Relevant completion guidance.",
-                    "url": "https://example.com/spe-reference",
-                }
-            ],
-        },
-    )
+    with (
+        patch("app.services.recommendation_generator.retrieve", return_value=[]),
+        patch(
+            "app.services.recommendation_generator.generate_text",
+            return_value="Recommandation pour le puits PF-02.",
+        ),
+    ):
+        response = client.post(
+            "/api/v1/recommendations",
+            json={
+                "wellName": "PF-02",
+                "rockType": "limestone",
+                "porosityFraction": 0.12,
+                "permeabilityMd": 15.0,
+                "reservoirPressurePsi": 2_500.0,
+                "trueVerticalDepthFt": 8_000.0,
+                "sources": [
+                    {
+                        "sourceType": "rag",
+                        "title": "SPE reference",
+                        "excerpt": "Relevant completion guidance.",
+                        "url": "https://example.com/spe-reference",
+                    }
+                ],
+            },
+        )
 
     assert response.status_code == 200
     assert response.json()["sources"][0]["sourceType"] == "rag"
