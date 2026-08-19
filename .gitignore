@@ -41,3 +41,8 @@ chroma/
 .DS_Store
 Thumbs.db
 Desktop.ini
+ 
+# --- Corpus brut (retelechargeable via docs/corpus/SOURCES.md) --- 
+docs/corpus/raw/* 
+!docs/corpus/raw/.gitkeep 
+
