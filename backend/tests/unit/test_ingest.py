@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from collections.abc import Sequence
+from collections.abc import Iterator, Sequence
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
@@ -18,7 +18,7 @@ class _FakeEmbeddingFunction:
 
 
 @pytest.fixture(autouse=True)
-def _isolated_rag_settings(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+def _isolated_rag_settings(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Iterator[None]:
     monkeypatch.setenv("CHROMA_PERSIST_DIR", str(tmp_path / ".chroma"))
     monkeypatch.setenv("CHROMA_COLLECTION_NAME", "test_corpus")
     monkeypatch.setenv("RAG_CHUNK_SIZE", "80")
