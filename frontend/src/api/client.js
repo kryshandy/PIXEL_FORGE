@@ -21,8 +21,12 @@ export async function apiPost(path, body) {
   }
 
   if (response.status === 422) {
-    const details = await response.json().catch(() => null);
-    throw new ApiError('Certains champs sont invalides.', 422, details);
+    const body = await response.json().catch(() => null);
+    const fieldErrors = body?.error?.details ?? [];
+    const summary = fieldErrors.length > 0
+      ? fieldErrors.map((d) => `${d.field} : ${d.message}`).join(' · ')
+      : body?.error?.message ?? 'Certains champs sont invalides.';
+    throw new ApiError(summary, 422, fieldErrors);
   }
 
   if (!response.ok) {

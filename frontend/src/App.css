@@ -400,3 +400,10 @@ body {
 }
 
 .reservoir-form__retry:hover { background: rgba(224, 104, 90, 0.08); }
+
+.result-panel__disclaimer {
+  margin-top: 0.75rem;
+  font-size: 0.72rem;
+  color: #5a6a7a;
+  font-style: italic;
+}

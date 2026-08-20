@@ -1,16 +1,47 @@
-# React + Vite
+# PetroSage — Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Interface web de **PetroSage**, copilote IA pour la complétion et la production de puits pétroliers conventionnels.
+Projet soumis au **Pixel Forge AI Hackathon** (15 → 22 août 2026).
 
-Currently, two official plugins are available:
+## Stack technique
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **React 18** + **Vite**
+- **Three.js** pour la scène 3D du hero
+- **Vitest** pour les tests unitaires
+- **Oxlint** pour le linting
 
-## React Compiler
+## Prérequis
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- Node.js 18+ et npm
+- Le backend FastAPI de PetroSage doit tourner en local pour que le formulaire retourne de vraies recommandations (voir `docs/` à la racine du dépôt pour le lancer)
 
-## Expanding the Oxlint configuration
+## Installation
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+```bash
+cd frontend
+npm install
+```
+
+## Variables d'environnement
+
+Copier `.env.example` vers `.env` et ajuster si besoin :
+
+```bash
+cp .env.example .env
+```
+
+| Variable | Description | Valeur par défaut |
+|---|---|---|
+| `VITE_API_BASE_URL` | URL de base de l'API backend | `http://127.0.0.1:8000/api/v1` |
+
+## Commandes disponibles
+
+| Commande | Description |
+|---|---|
+| `npm run dev` | Lance le serveur de développement (`http://localhost:5173`) |
+| `npm run build` | Build de production dans `dist/` |
+| `npm run preview` | Prévisualise le build de production en local |
+| `npm run lint` | Vérifie le code avec Oxlint |
+| `npm run test` | Lance les tests unitaires (Vitest) |
+
+## Structure du projet
