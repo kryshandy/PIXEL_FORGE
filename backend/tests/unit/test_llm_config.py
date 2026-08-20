@@ -15,39 +15,39 @@ def _clear_cache() -> Iterator[None]:
 
 
 def test_from_environment_raises_without_api_key(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+    monkeypatch.delenv("GEMINI_API_KEY", raising=False)
 
-    with pytest.raises(RuntimeError, match="ANTHROPIC_API_KEY"):
+    with pytest.raises(RuntimeError, match="GEMINI_API_KEY"):
         llm_config.LlmSettings.from_environment()
 
 
 def test_from_environment_reads_configured_values(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setenv("ANTHROPIC_API_KEY", "sk-ant-test-key")
-    monkeypatch.setenv("ANTHROPIC_MODEL", "claude-sonnet-5")
-    monkeypatch.setenv("ANTHROPIC_MAX_TOKENS", "2048")
+    monkeypatch.setenv("GEMINI_API_KEY", "test-key")
+    monkeypatch.setenv("GEMINI_MODEL", "gemini-3.6-flash")
+    monkeypatch.setenv("GEMINI_MAX_TOKENS", "2048")
 
     settings = llm_config.LlmSettings.from_environment()
 
-    assert settings.api_key == "sk-ant-test-key"
-    assert settings.model == "claude-sonnet-5"
+    assert settings.api_key == "test-key"
+    assert settings.model == "gemini-3.6-flash"
     assert settings.max_tokens == 2048
 
 
 def test_from_environment_uses_default_model_and_max_tokens(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    monkeypatch.setenv("ANTHROPIC_API_KEY", "sk-ant-test-key")
-    monkeypatch.delenv("ANTHROPIC_MODEL", raising=False)
-    monkeypatch.delenv("ANTHROPIC_MAX_TOKENS", raising=False)
+    monkeypatch.setenv("GEMINI_API_KEY", "test-key")
+    monkeypatch.delenv("GEMINI_MODEL", raising=False)
+    monkeypatch.delenv("GEMINI_MAX_TOKENS", raising=False)
 
     settings = llm_config.LlmSettings.from_environment()
 
-    assert settings.model == "claude-sonnet-5"
+    assert settings.model == "gemini-3.6-flash"
     assert settings.max_tokens == 1024
 
 
 def test_get_llm_settings_is_cached(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setenv("ANTHROPIC_API_KEY", "sk-ant-test-key")
+    monkeypatch.setenv("GEMINI_API_KEY", "test-key")
 
     first = llm_config.get_llm_settings()
     second = llm_config.get_llm_settings()

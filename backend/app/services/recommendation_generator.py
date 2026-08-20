@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from app.api.schemas import RecommendationRequest, RecommendationResponse, SourceCitation
 from app.rag.retrieve import RetrievedChunk, retrieve
-from app.services.claude_client import generate_text
+from app.services.gemini_client import generate_text
 
 _SYSTEM_PROMPT = (
     "Tu es PetroSage, un copilote d'ingenierie pour la completion et la "
