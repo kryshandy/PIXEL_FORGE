@@ -33,14 +33,20 @@ function validate(form) {
   return errors;
 }
 
+const ROCK_TYPE_API_LABELS = {
+  gres: 'Sandstone',
+  calcaire: 'Limestone',
+  dolomie: 'Dolomite',
+};
+
 function buildPayload(form) {
   return {
     wellName: form.wellName.trim(),
-    rockType: form.rockType,
-    porosity: porosityPercentToFraction(form.porosity),
-    permeability: Number(form.permeability),
-    pressure: Number(form.pressure),
-    depthFeet: metersToFeet(form.depth),
+    rockType: ROCK_TYPE_API_LABELS[form.rockType] ?? form.rockType,
+    porosityFraction: porosityPercentToFraction(form.porosity),
+    permeabilityMd: Number(form.permeability),
+    reservoirPressurePsi: Number(form.pressure),
+    trueVerticalDepthFt: metersToFeet(form.depth),
   };
 }
 
