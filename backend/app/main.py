@@ -2,20 +2,24 @@
 
 from __future__ import annotations
 
-from collections.abc import Awaitable, Callable
-from uuid import uuid4
+from dotenv import load_dotenv
 
-from fastapi import FastAPI, Request
-from fastapi.encoders import jsonable_encoder
-from fastapi.exceptions import RequestValidationError
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse, Response
-from starlette.exceptions import HTTPException as StarletteHTTPException
+load_dotenv()
 
-from app.api.errors import ApiException
-from app.api.router import api_router
-from app.api.schemas import ApiError, ApiErrorDetail, ErrorEnvelope
-from app.core.config import get_settings
+from collections.abc import Awaitable, Callable  # noqa: E402
+from uuid import uuid4  # noqa: E402
+
+from fastapi import FastAPI, Request  # noqa: E402
+from fastapi.encoders import jsonable_encoder  # noqa: E402
+from fastapi.exceptions import RequestValidationError  # noqa: E402
+from fastapi.middleware.cors import CORSMiddleware  # noqa: E402
+from fastapi.responses import JSONResponse, Response  # noqa: E402
+from starlette.exceptions import HTTPException as StarletteHTTPException  # noqa: E402
+
+from app.api.errors import ApiException  # noqa: E402
+from app.api.router import api_router  # noqa: E402
+from app.api.schemas import ApiError, ApiErrorDetail, ErrorEnvelope  # noqa: E402
+from app.core.config import get_settings  # noqa: E402
 
 
 def create_app() -> FastAPI:
@@ -24,8 +28,8 @@ def create_app() -> FastAPI:
         title=settings.app_name,
         version=settings.version,
         description=(
-            "API du copilote IA Pixel Forge pour la complétion et la production "
-            "de puits pétroliers conventionnels."
+            "API du copilote IA Pixel Forge pour la completion et la production "
+            "de puits petroliers conventionnels."
         ),
         docs_url="/docs",
         redoc_url="/redoc",
