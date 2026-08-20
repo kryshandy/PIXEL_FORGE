@@ -62,22 +62,22 @@ export default function ReservoirForm({ onResult }) {
   }
 
   async function submitPayload(payload) {
-    setStatus('loading');
-    onResult({ status: 'loading' });
-    try {
-      const data = await apiPost('/recommendations', payload);
-      setStatus('idle');
-      onResult({ status: 'success', data });
-    } catch (err) {
-      setStatus('error');
-      const message =
-        err instanceof ApiError
-          ? err.message
-          : 'Une erreur inattendue est survenue.';
-      const details = err instanceof ApiError && err.details && Object.keys(err.details).length > 0 ? err.details : null;
-      onResult({ status: 'error', message, details });
-    }
+  setStatus('loading');
+  onResult({ status: 'loading' });
+  try {
+    const data = await apiPost('/recommendations', payload);
+    setStatus('idle');
+    onResult({ status: 'success', data });
+  } catch (err) {
+    setStatus('error');
+    const message =
+      err instanceof ApiError
+        ? err.message
+        : 'Une erreur inattendue est survenue.';
+    const requestId = err instanceof ApiError ? err.requestId : null;
+    onResult({ status: 'error', message, requestId });
   }
+}
 
   function handleSubmit(e) {
     e.preventDefault();

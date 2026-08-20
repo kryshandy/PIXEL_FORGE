@@ -24,6 +24,9 @@ export default function ResultPanel({ result }) {
         <p>{result.message}</p>
       </div>
     );
+    {result.requestId && (
+      <p className="result-panel__request-id">ID de requête : <code>{result.requestId}</code></p>
+    )}
   }
 
   const data = result.data ?? {};
