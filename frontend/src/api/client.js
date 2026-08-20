@@ -1,10 +1,11 @@
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export class ApiError extends Error {
-  constructor(message, status, details) {
+  constructor(message, status, details, requestId) {
     super(message);
     this.status = status;
     this.details = details;
+    this.requestId = requestId;
   }
 }
 
@@ -23,10 +24,11 @@ export async function apiPost(path, body) {
   if (response.status === 422) {
     const body = await response.json().catch(() => null);
     const fieldErrors = body?.error?.details ?? [];
+    const requestId = body?.error?.requestId ?? response.headers.get('X-Request-ID');
     const summary = fieldErrors.length > 0
       ? fieldErrors.map((d) => `${d.field} : ${d.message}`).join(' · ')
       : body?.error?.message ?? 'Certains champs sont invalides.';
-    throw new ApiError(summary, 422, fieldErrors);
+    throw new ApiError(summary, 422, fieldErrors, requestId);
   }
 
   if (!response.ok) {
