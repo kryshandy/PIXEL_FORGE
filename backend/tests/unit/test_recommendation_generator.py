@@ -81,6 +81,44 @@ def test_generate_recommendation_includes_rag_sources() -> None:
         "06_intro_petroleum_engineering.pdf",
     }
 
+def test_generate_recommendation_dedupes_sources_from_same_document() -> None:
+    """Regression test: retrieve() can return several chunks from the same
+    PDF (small/skewed corpus), which used to list that file multiple times
+    in the UI's Sources section."""
+    request = _build_request()
+    repeated_source_chunks = [
+        RetrievedChunk(
+            text=f"Extrait {index} sur le controle des sables.",
+            source="06_intro_petroleum_engineering.pdf",
+            chunk_index=index,
+            distance=0.30 + index * 0.01,
+        )
+        for index in range(6)
+    ]
+
+    with (
+        patch(
+            "app.services.recommendation_generator.retrieve",
+            return_value=repeated_source_chunks,
+        ) as mock_retrieve,
+        patch(
+            "app.services.recommendation_generator.generate_text",
+            return_value="Recommandation.",
+        ) as mock_generate_text,
+    ):
+        response = recommendation_generator.generate_recommendation(request)
+
+    rag_sources = [source for source in response.sources if source.source_type == "rag"]
+    assert len(rag_sources) == 1
+    assert rag_sources[0].title == "06_intro_petroleum_engineering.pdf"
+    # The most relevant excerpt (lowest distance = first chunk) is kept.
+    assert "Extrait 0" in rag_sources[0].excerpt
+
+    # The LLM prompt still receives every retrieved chunk, deduped or not:
+    # repeated source files can still hold distinct, useful passages.
+    mock_retrieve.assert_called_once()
+    user_prompt = mock_generate_text.call_args.args[1]
+    assert "Extrait 5" in user_prompt
 
 def test_generate_recommendation_preserves_caller_supplied_sources() -> None:
     from app.api.schemas import SourceCitation

@@ -43,7 +43,7 @@ def test_from_environment_uses_default_model_and_max_tokens(
     settings = llm_config.LlmSettings.from_environment()
 
     assert settings.model == "gemini-3.6-flash"
-    assert settings.max_tokens == 1024
+    assert settings.max_tokens == 2048
 
 
 def test_get_llm_settings_is_cached(monkeypatch: pytest.MonkeyPatch) -> None:
