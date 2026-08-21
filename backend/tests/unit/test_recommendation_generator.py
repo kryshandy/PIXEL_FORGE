@@ -134,7 +134,7 @@ def test_generate_recommendation_handles_empty_rag_results() -> None:
     assert response.recommendation == "Recommandation sans contexte documentaire."
 
 
-def test_generate_recommendation_response_status_is_preliminary() -> None:
+def test_generate_recommendation_response_status_is_rag_backed() -> None:
     request = _build_request()
 
     with (
@@ -146,7 +146,7 @@ def test_generate_recommendation_response_status_is_preliminary() -> None:
     ):
         response = recommendation_generator.generate_recommendation(request)
 
-    assert response.status == "preliminary"
+    assert response.status == "ragBacked"
 
 
 @pytest.mark.parametrize(

@@ -125,7 +125,7 @@ class RecommendationRequest(ApiModel):
 
 
 class RecommendationResponse(ApiModel):
-    status: Literal["preliminary"]
+    status: Literal["preliminary", "ragBacked"]
     recommendation: str
     sources: list[SourceCitation]
     disclaimer: str
