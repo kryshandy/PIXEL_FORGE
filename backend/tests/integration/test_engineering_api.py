@@ -126,9 +126,9 @@ def test_recommendations_endpoint_exposes_text_and_sources() -> None:
             },
         )
 
-    assert response.status_code == 200
+        assert response.status_code == 200
     payload = response.json()
-    assert payload["status"] == "preliminary"
+    assert payload["status"] == "ragBacked"
     assert "PF-01" in payload["recommendation"]
 
 

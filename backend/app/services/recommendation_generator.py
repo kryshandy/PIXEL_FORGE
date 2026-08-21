@@ -109,7 +109,7 @@ def generate_recommendation(request: RecommendationRequest) -> RecommendationRes
     sources = list(request.sources) + [_chunk_to_source_citation(chunk) for chunk in chunks]
 
     return RecommendationResponse(
-        status="preliminary",
+        status="ragBacked",
         recommendation=recommendation_text,
         sources=sources,
         disclaimer=(
