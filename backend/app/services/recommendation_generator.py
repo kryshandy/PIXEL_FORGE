@@ -84,6 +84,26 @@ def _chunk_to_source_citation(chunk: RetrievedChunk) -> SourceCitation:
     )
 
 
+def _dedupe_chunks_by_source(chunks: list[RetrievedChunk]) -> list[RetrievedChunk]:
+    """Keep at most one chunk per source document.
+
+    `retrieve()` returns the `top_k` chunks closest to the query, which can
+    all come from the same file when the corpus is small or one document
+    dominates for a given query. Without this, the UI lists the same
+    source file several times. Chunks arrive ordered by ascending distance
+    (most relevant first), so keeping the first occurrence per source also
+    keeps the most relevant excerpt for that document.
+    """
+    seen_sources: set[str] = set()
+    deduped: list[RetrievedChunk] = []
+    for chunk in chunks:
+        if chunk.source in seen_sources:
+            continue
+        seen_sources.add(chunk.source)
+        deduped.append(chunk)
+    return deduped
+
+
 def generate_recommendation(request: RecommendationRequest) -> RecommendationResponse:
     """Generate a Claude-backed recommendation grounded in RAG + engineering results.
 
@@ -103,10 +123,17 @@ def generate_recommendation(request: RecommendationRequest) -> RecommendationRes
     query = _build_retrieval_query(request)
     chunks = retrieve(query)
 
+    # Full (non-deduped) chunks still go to the LLM prompt: even repeated
+    # source files can carry distinct, useful passages for the answer.
     user_prompt = _build_user_prompt(request, chunks)
     recommendation_text = generate_text(_SYSTEM_PROMPT, user_prompt)
 
-    sources = list(request.sources) + [_chunk_to_source_citation(chunk) for chunk in chunks]
+    # Deduped chunks only for the citation list shown to the user, so the
+    # same PDF doesn't appear multiple times in "Sources".
+    unique_chunks = _dedupe_chunks_by_source(chunks)
+    sources = list(request.sources) + [
+        _chunk_to_source_citation(chunk) for chunk in unique_chunks
+    ]
 
     return RecommendationResponse(
         status="ragBacked",

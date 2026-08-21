@@ -7,7 +7,12 @@ from dataclasses import dataclass
 from functools import lru_cache
 
 _DEFAULT_MODEL = "gemini-3.6-flash"
-_DEFAULT_MAX_TOKENS = 1024
+# Gemini 2.5+/3.x "thinking" models spend part of this budget on internal
+# reasoning (thoughtsTokenCount) before writing any visible text: the budget
+# is shared, not additive. 1024 was too low and left ~0 tokens for the
+# answer once thinking ran, truncating the recommendation mid-sentence.
+# Raised as a safety margin on top of disabling thinking in gemini_client.
+_DEFAULT_MAX_TOKENS = 2048
 
 
 @dataclass(frozen=True, slots=True)

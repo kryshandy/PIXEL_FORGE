@@ -46,6 +46,12 @@ def generate_text(
         config=types.GenerateContentConfig(
             system_instruction=system_prompt,
             max_output_tokens=settings.max_tokens,
+            # Gemini 2.5+/3.x models think by default, and thinking tokens
+            # are deducted from max_output_tokens (not a separate budget).
+            # This task is templated drafting from facts we already supply
+            # (RAG excerpts + calc results), not open-ended reasoning, so we
+            # disable thinking entirely to guarantee the full answer fits.
+            thinking_config=types.ThinkingConfig(thinking_budget=0),
         ),
     )
 

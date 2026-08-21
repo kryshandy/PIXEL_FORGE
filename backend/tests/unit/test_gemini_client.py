@@ -58,6 +58,11 @@ def test_generate_text_calls_generate_content_with_settings() -> None:
     assert call_kwargs["contents"] == "usr"
     assert call_kwargs["config"].system_instruction == "sys"
     assert call_kwargs["config"].max_output_tokens == 1024
+    # Thinking must be disabled, otherwise Gemini 2.5+/3.x models deduct
+    # their internal reasoning tokens from max_output_tokens, truncating
+    # or emptying the visible response (regression: recommendation text
+    # was cut off mid-sentence in the UI).
+    assert call_kwargs["config"].thinking_config.thinking_budget == 0
 
 
 def test_get_gemini_client_is_cached() -> None:
