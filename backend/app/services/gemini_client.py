@@ -46,6 +46,16 @@ def generate_text(
         config=types.GenerateContentConfig(
             system_instruction=system_prompt,
             max_output_tokens=settings.max_tokens,
+            # Gemini 3.x models (incl. gemini-3.6-flash) cannot disable
+            # thinking at all -- thinking_budget=0 is a Gemini 2.5-only
+            # option and errors out on 3.x (this is why it was reverted in
+            # PR #13). The correct 3.x lever is thinking_level: MINIMAL is
+            # the lowest available setting. Thinking tokens are still
+            # deducted from max_output_tokens even at MINIMAL, so
+            # max_tokens is kept generous (see llm_config) as a safety net.
+            thinking_config=types.ThinkingConfig(
+                thinking_level=types.ThinkingLevel.MINIMAL,
+            )
         ),
     )
 
