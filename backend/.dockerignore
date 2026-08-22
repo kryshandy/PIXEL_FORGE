@@ -1,0 +1,15 @@
+# NOTE: .chroma/ must stay OUT of this file — the Dockerfile intentionally
+# COPYs it into the image (see Dockerfile comments).
+
+.venv/
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.coverage
+htmlcov/
+tests/
+.git/
+.env
+.env.*
+!.env.example

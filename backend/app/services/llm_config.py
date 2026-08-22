@@ -12,7 +12,7 @@ _DEFAULT_MODEL = "gemini-3.6-flash"
 # is shared, not additive. 1024 was too low and left ~0 tokens for the
 # answer once thinking ran, truncating the recommendation mid-sentence.
 # Raised as a safety margin on top of disabling thinking in gemini_client.
-_DEFAULT_MAX_TOKENS = 2048
+_DEFAULT_MAX_TOKENS = 3072
 
 
 @dataclass(frozen=True, slots=True)
